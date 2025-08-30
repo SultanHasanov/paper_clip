@@ -55,7 +55,9 @@ const DatingGoalsComponent = () => {
         minHeight: "100vh",
       }}
     >
-      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+      <div
+        style={{ textAlign: "center", marginBottom: "20px", padding: "0 25px" }}
+      >
         <Title
           level={2}
           style={{
@@ -83,7 +85,7 @@ const DatingGoalsComponent = () => {
 
       <Card
         style={{
-          marginBottom: "20px",
+          marginBottom: "12px",
           borderRadius: "12px",
           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         }}
@@ -101,7 +103,7 @@ const DatingGoalsComponent = () => {
           Мои цели
         </Title>
 
-        <Space size={[6, 6]} wrap style={{ marginBottom: "16px" }}>
+        <Space size={[0, 6]} wrap style={{ marginBottom: "16px" }}>
           {selectedGoals.map((goal, index) => (
             <Tag
               key={index}
