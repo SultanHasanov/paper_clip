@@ -644,9 +644,7 @@ const ProfileComponent = ({ onBack }) => {
         </div>
       </div>
 
-      <div
-        style={{ textAlign: "center", marginBottom: "40px", padding: "0 20px" }}
-      >
+      <div style={{ textAlign: "center", marginBottom: "40px" }}>
         <Title
           level={2}
           style={{
