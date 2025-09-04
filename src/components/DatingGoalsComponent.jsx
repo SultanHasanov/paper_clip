@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, Tag, Input, Button, Space, Typography } from "antd";
 import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
-
 const { Title, Text } = Typography;
 
 // Компонент выбора целей знакомства
@@ -330,8 +329,6 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
         minHeight: "100vh",
       }}
     >
-     
-
       <div
         style={{
           display: "flex",
@@ -570,7 +567,7 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
 
 // Компонент заполнения профиля
 const ProfileComponent = ({ onBack }) => {
- const [name, setName] = useState("");
+  const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [about, setAbout] = useState("");
   const [photoUrl, setPhotoUrl] = useState(null);
@@ -584,7 +581,6 @@ const ProfileComponent = ({ onBack }) => {
     }
   }, []);
 
-
   return (
     <div
       style={{
@@ -596,7 +592,6 @@ const ProfileComponent = ({ onBack }) => {
       }}
     >
       {/* Progress indicator */}
-     
 
       <div
         style={{
@@ -634,7 +629,7 @@ const ProfileComponent = ({ onBack }) => {
             position: "relative",
           }}
         >
-           <span
+          <span
             style={{
               position: "absolute",
               top: "-20px", // подняли над линией
@@ -650,7 +645,7 @@ const ProfileComponent = ({ onBack }) => {
       </div>
 
       <div
-        style={{ textAlign: "center", marginBottom: "40px", padding: "0 25px" }}
+        style={{ textAlign: "center", marginBottom: "40px", padding: "0 20px" }}
       >
         <Title
           level={2}
@@ -721,12 +716,13 @@ const ProfileComponent = ({ onBack }) => {
           value={name}
           onChange={(e) => setName(e.target.value)}
           style={{
-            marginTop: "8px",
+            marginTop: "2px",
             borderRadius: "8px",
             backgroundColor: "#F9F9F9",
             border: "1px solid #E5E5E5",
             fontSize: "16px",
             padding: "12px",
+            height: "48px",
           }}
         />
       </div>
@@ -737,16 +733,32 @@ const ProfileComponent = ({ onBack }) => {
           Дата рождения
         </Text>
         <Input
-          placeholder="ДД. ММ. ГГГГ"
+          placeholder="ДД.ММ.ГГГГ"
           value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
+          onChange={(e) => {
+            let val = e.target.value.replace(/\D/g, ""); // оставляем только цифры
+
+            if (val.length > 8) val = val.slice(0, 8); // максимум 8 цифр
+
+            // Автоставим точки
+            if (val.length >= 5) {
+              val = `${val.slice(0, 2)}.${val.slice(2, 4)}.${val.slice(4)}`;
+            } else if (val.length >= 3) {
+              val = `${val.slice(0, 2)}.${val.slice(2)}`;
+            }
+
+            setBirthDate(val);
+          }}
+          inputMode="numeric"
+          pattern="\d{2}\.\d{2}\.\d{4}"
           style={{
-            marginTop: "8px",
+            marginTop: "2px",
             borderRadius: "8px",
             backgroundColor: "#F9F9F9",
             border: "1px solid #E5E5E5",
             fontSize: "16px",
             padding: "12px",
+            height: "48px",
           }}
         />
       </div>
@@ -763,7 +775,7 @@ const ProfileComponent = ({ onBack }) => {
           maxLength={160}
           showCount
           style={{
-            marginTop: "8px",
+            marginTop: "2px",
             borderRadius: "8px",
             backgroundColor: "#F9F9F9",
             border: "1px solid #E5E5E5",
