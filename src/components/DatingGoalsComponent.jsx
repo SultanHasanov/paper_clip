@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Tag, Input, Button, Space, Typography } from "antd";
+import { Card, Tag, Input, Button, Space, Typography, Spin } from "antd";
 import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
 const { Title, Text } = Typography;
 
@@ -53,6 +53,8 @@ const DatingGoalsComponent = ({ onNext }) => {
         maxWidth: "600px",
         margin: "0 auto",
         minHeight: "100vh",
+        position: "relative",
+        paddingBottom: "100px", // Добавляем отступ снизу для фиксированных кнопок
       }}
     >
       <div
@@ -88,15 +90,14 @@ const DatingGoalsComponent = ({ onNext }) => {
             width: "25%",
             borderRadius: "5px",
             marginLeft: "8px",
-            position: "relative", // добавлено
+            position: "relative",
           }}
         >
-          {/* Текст теперь внутри последней линии */}
           <span
             style={{
               position: "absolute",
-              top: "-20px", // подняли над линией
-              right: 0, // привязали к правому краю
+              top: "-20px",
+              right: "0",
               fontSize: "13px",
               fontWeight: 600,
               color: "#8C8C8C",
@@ -250,25 +251,45 @@ const DatingGoalsComponent = ({ onNext }) => {
           ))}
         </Space>
       </Card>
-      <div style={{ display: "flex", justifyContent: "end" }}>
-        <Button
-          type="primary"
-          size="large"
-          onClick={() => onNext(selectedGoals)}
+
+      {/* Фиксированные кнопки */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: "20px",
+          zIndex: 1000,
+        }}
+      >
+        <div
           style={{
-            backgroundColor: "#000",
-            borderColor: "#000",
-            borderRadius: "8px",
-            height: "clamp(50px, 10vw, 50px)",
-            fontSize: "clamp(20px, 3.5vw, 24px)",
-            fontWeight: 700,
-            width: "150px",
-            color: "#CDDDDB",
-            padding: "0 0 5px 0",
+            maxWidth: "600px",
+            margin: "0 auto",
+            display: "flex",
+            justifyContent: "flex-end",
           }}
         >
-          Далее
-        </Button>
+          <Button
+            type="primary"
+            size="large"
+            onClick={() => onNext(selectedGoals)}
+            style={{
+              backgroundColor: "#000",
+              borderColor: "#000",
+              borderRadius: "8px",
+              height: "clamp(50px, 10vw, 50px)",
+              fontSize: "clamp(20px, 3.5vw, 24px)",
+              fontWeight: 700,
+              width: "135px",
+              color: "#CDDDDB",
+              padding: "0 0 5px 0",
+            }}
+          >
+            Далее
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -327,6 +348,8 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
         maxWidth: "600px",
         margin: "0 auto",
         minHeight: "100vh",
+        position: "relative",
+        paddingBottom: "100px", // Добавляем отступ снизу для фиксированных кнопок
       }}
     >
       <div
@@ -368,8 +391,8 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
           <span
             style={{
               position: "absolute",
-              top: "-20px", // подняли над линией
-              right: 0, // привязали к правому краю
+              top: "-20px",
+              right: "0",
               fontSize: "13px",
               fontWeight: 600,
               color: "#8C8C8C",
@@ -381,7 +404,7 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
       </div>
 
       <div
-        style={{ textAlign: "center", marginBottom: "20px", padding: "0 25px" }}
+        style={{ textAlign: "center", marginBottom: "20px", padding: "0 10px" }}
       >
         <Title
           level={2}
@@ -524,42 +547,61 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
         </Space>
       </Card>
 
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <Button
-          size="large"
-          onClick={onBack}
+      {/* Фиксированные кнопки */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: "20px",
+          zIndex: 1000,
+        }}
+      >
+        <div
           style={{
-            backgroundColor: "#000",
-            borderColor: "#000",
-            borderRadius: "8px",
-            height: "clamp(50px, 10vw, 50px)",
-            fontSize: "clamp(20px, 3.5vw, 24px)",
-            fontWeight: 700,
-            width: "150px",
-            color: "#CDDDDB",
-            padding: "0 0 5px 0",
+            maxWidth: "600px",
+            margin: "0 auto",
+            display: "flex",
+            justifyContent: "space-between",
           }}
         >
-          Назад
-        </Button>
-        <Button
-          type="primary"
-          size="large"
-          onClick={() => onNext(selectedCharacteristics)}
-          style={{
-            backgroundColor: "#000",
-            borderColor: "#000",
-            borderRadius: "5px",
-            height: "clamp(50px, 10vw, 50px)",
-            fontSize: "clamp(20px, 3.5vw, 24px)",
-            fontWeight: 700,
-            width: "150px",
-            color: "#CDDDDB",
-            padding: "0 0 5px 0",
-          }}
-        >
-          Далее
-        </Button>
+          <Button
+            size="large"
+            onClick={onBack}
+            style={{
+              backgroundColor: "#000",
+              borderColor: "#000",
+              borderRadius: "8px",
+              height: "clamp(50px, 10vw, 50px)",
+              fontSize: "clamp(20px, 3.5vw, 24px)",
+              fontWeight: 700,
+              width: "135px",
+              color: "#CDDDDB",
+              padding: "0 0 5px 0",
+            }}
+          >
+            Назад
+          </Button>
+          <Button
+            type="primary"
+            size="large"
+            onClick={() => onNext(selectedCharacteristics)}
+            style={{
+              backgroundColor: "#000",
+              borderColor: "#000",
+              borderRadius: "5px",
+              height: "clamp(50px, 10vw, 50px)",
+              fontSize: "clamp(20px, 3.5vw, 24px)",
+              fontWeight: 700,
+              width: "135px",
+              color: "#CDDDDB",
+              padding: "0 0 5px 0",
+            }}
+          >
+            Далее
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -571,13 +613,19 @@ const ProfileComponent = ({ onBack }) => {
   const [birthDate, setBirthDate] = useState("");
   const [about, setAbout] = useState("");
   const [photoUrl, setPhotoUrl] = useState(null);
+  const [isPhotoLoading, setIsPhotoLoading] = useState(true);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (tg?.initDataUnsafe?.user) {
       const user = tg.initDataUnsafe.user;
       if (user.first_name) setName(user.first_name);
-      if (user.photo_url) setPhotoUrl(user.photo_url);
+      if (user.photo_url) {
+        setIsPhotoLoading(true);
+        setPhotoUrl(user.photo_url);
+      } else {
+        setIsPhotoLoading(false);
+      }
     }
   }, []);
 
@@ -589,10 +637,10 @@ const ProfileComponent = ({ onBack }) => {
         maxWidth: "600px",
         margin: "0 auto",
         minHeight: "100vh",
+        position: "relative",
+        paddingBottom: "100px", // Добавляем отступ снизу для фиксированных кнопок
       }}
     >
-      {/* Progress indicator */}
-
       <div
         style={{
           display: "flex",
@@ -632,8 +680,8 @@ const ProfileComponent = ({ onBack }) => {
           <span
             style={{
               position: "absolute",
-              top: "-20px", // подняли над линией
-              right: 0, // привязали к правому краю
+              top: "-20px",
+              right: "0",
               fontSize: "13px",
               fontWeight: 600,
               color: "#8C8C8C",
@@ -671,10 +719,27 @@ const ProfileComponent = ({ onBack }) => {
 
       {/* Profile Picture */}
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        {photoUrl ? (
+        {isPhotoLoading ? (
+          <div
+            style={{
+              width: "120px",
+              height: "120px",
+              borderRadius: "50%",
+              backgroundColor: "#f0f0f0",
+              margin: "0 auto",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Spin size="large" />
+          </div>
+        ) : photoUrl ? (
           <img
             src={photoUrl}
             alt="profile"
+            onLoad={() => setIsPhotoLoading(false)}
+            onError={() => setIsPhotoLoading(false)}
             style={{
               width: "120px",
               height: "120px",
@@ -734,17 +799,13 @@ const ProfileComponent = ({ onBack }) => {
           placeholder="ДД.ММ.ГГГГ"
           value={birthDate}
           onChange={(e) => {
-            let val = e.target.value.replace(/\D/g, ""); // оставляем только цифры
-
-            if (val.length > 8) val = val.slice(0, 8); // максимум 8 цифр
-
-            // Автоставим точки
+            let val = e.target.value.replace(/\D/g, "");
+            if (val.length > 8) val = val.slice(0, 8);
             if (val.length >= 5) {
               val = `${val.slice(0, 2)}.${val.slice(2, 4)}.${val.slice(4)}`;
             } else if (val.length >= 3) {
               val = `${val.slice(0, 2)}.${val.slice(2)}`;
             }
-
             setBirthDate(val);
           }}
           inputMode="numeric"
@@ -784,42 +845,61 @@ const ProfileComponent = ({ onBack }) => {
         />
       </div>
 
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <Button
-          size="large"
-          onClick={onBack}
+      {/* Фиксированные кнопки */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: "20px",
+          zIndex: 1000,
+        }}
+      >
+        <div
           style={{
-            backgroundColor: "#000",
-            borderColor: "#000",
-            borderRadius: "5px",
-            height: "clamp(50px, 10vw, 50px)",
-            fontSize: "clamp(20px, 3.5vw, 24px)",
-            fontWeight: 700,
-            width: "150px",
-            color: "#CDDDDB",
-            padding: "0 0 5px 0",
+            maxWidth: "600px",
+            margin: "0 auto",
+            display: "flex",
+            justifyContent: "space-between",
           }}
         >
-          Назад
-        </Button>
-        <Button
-          type="primary"
-          size="large"
-          style={{
-            backgroundColor: "#7A7A7A",
-            borderColor: "#7A7A7A",
-            borderRadius: "5px",
-            height: "clamp(50px, 10vw, 50px)",
-            fontSize: "clamp(20px, 3.5vw, 24px)",
-            fontWeight: 700,
-            width: "150px",
-            color: "#FFFFFF",
-            padding: "0 0 5px 0",
-          }}
-          onClick={() => alert("Профиль создан!")}
-        >
-          Далее
-        </Button>
+          <Button
+            size="large"
+            onClick={onBack}
+            style={{
+              backgroundColor: "#000",
+              borderColor: "#000",
+              borderRadius: "5px",
+              height: "clamp(50px, 10vw, 50px)",
+              fontSize: "clamp(20px, 3.5vw, 24px)",
+              fontWeight: 700,
+              width: "135px",
+              color: "#CDDDDB",
+              padding: "0 0 5px 0",
+            }}
+          >
+            Назад
+          </Button>
+          <Button
+            type="primary"
+            size="large"
+            style={{
+              backgroundColor: "#7A7A7A",
+              borderColor: "#7A7A7A",
+              borderRadius: "5px",
+              height: "clamp(50px, 10vw, 50px)",
+              fontSize: "clamp(20px, 3.5vw, 24px)",
+              fontWeight: 700,
+              width: "135px",
+              color: "#FFFFFF",
+              padding: "0 0 5px 0",
+            }}
+            onClick={() => alert("Профиль создан!")}
+          >
+            Далее
+          </Button>
+        </div>
       </div>
     </div>
   );
