@@ -613,7 +613,7 @@ const ProfileComponent = ({ onBack }) => {
   const [birthDate, setBirthDate] = useState("");
   const [about, setAbout] = useState("");
   const [photoUrl, setPhotoUrl] = useState(null);
-  const [isPhotoLoading, setIsPhotoLoading] = useState(true);
+  const [isPhotoLoading, setIsPhotoLoading] = useState(false);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
@@ -623,11 +623,29 @@ const ProfileComponent = ({ onBack }) => {
       if (user.photo_url) {
         setIsPhotoLoading(true);
         setPhotoUrl(user.photo_url);
-      } else {
-        setIsPhotoLoading(false);
       }
+      // else case не нужен, так как isPhotoLoading уже false
     }
   }, []);
+
+  useEffect(() => {
+    if (photoUrl) {
+      // Создаем изображение для проверки загрузки
+      const img = new Image();
+      img.onload = () => setIsPhotoLoading(false);
+      img.onerror = () => setIsPhotoLoading(false);
+      img.src = photoUrl;
+
+      // На всякий случай устанавливаем таймаут
+      const timer = setTimeout(() => {
+        setIsPhotoLoading(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    } else {
+      setIsPhotoLoading(false);
+    }
+  }, [photoUrl]);
 
   return (
     <div
@@ -738,11 +756,9 @@ const ProfileComponent = ({ onBack }) => {
           <img
             src={photoUrl}
             alt="profile"
-            onLoad={() => setIsPhotoLoading(false)}
-            onError={() => setIsPhotoLoading(false)}
             style={{
-              width: "120px",
-              height: "120px",
+              width: "130px",
+              height: "130px",
               borderRadius: "50%",
               objectFit: "cover",
               margin: "0 auto",
