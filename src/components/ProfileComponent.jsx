@@ -1,6 +1,6 @@
 // components/ProfileComponent.jsx
 import React, { useEffect, useState, useRef } from "react";
-import { Input, Typography, Spin, message } from "antd";
+import { Input, Typography, Spin, Drawer, message } from "antd";
 import ProgressBar from "./ProgressBar";
 import FixedButtons from "./FixedButtons";
 
@@ -233,32 +233,6 @@ const ProfileComponent = ({ onBack }) => {
     setShowPhotoMenu(false);
   };
 
-  // Функция для показа Telegram Popup
-  const showTelegramPopup = () => {
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.showPopup({
-        title: "Выберите фото",
-        message: "Как вы хотите добавить фото?",
-        buttons: [
-          { id: "take_photo", type: "default", text: "Сделать фото" },
-          { id: "choose_gallery", type: "default", text: "Выбрать из галереи" },
-          { id: "cancel", type: "cancel", text: "Отменить" }
-        ]
-      }, (buttonId) => {
-        if (buttonId === "take_photo") {
-          handleTakePhoto();
-        } else if (buttonId === "choose_gallery") {
-          handleChooseFromGallery();
-        }
-        // Для кнопки "Отменить" ничего не делаем, просто закрывается popup
-      });
-    } else {
-      // Fallback для браузера - используем старый Drawer
-      setShowPhotoMenu(true);
-    }
-  };
-
   return (
     <div
       style={{
@@ -269,6 +243,8 @@ const ProfileComponent = ({ onBack }) => {
         minHeight: "100vh",
         position: "relative",
         paddingBottom: "100px",
+        filter: showPhotoMenu ? "blur(2.5px)" : "none",
+        transition: "filter 0.3s ease",
       }}
     >
       <ProgressBar currentStep={3} totalSteps={3} />
@@ -303,7 +279,7 @@ const ProfileComponent = ({ onBack }) => {
         <div>
           {isPhotoLoading ? (
             <div
-              onClick={showTelegramPopup}
+              onClick={handleAvatarClick}
               style={{
                 width: "120px",
                 height: "120px",
@@ -320,7 +296,8 @@ const ProfileComponent = ({ onBack }) => {
             </div>
           ) : photoUrl ? (
             <img
-              onClick={showTelegramPopup}
+             onClick={handleAvatarClick}
+
               src={photoUrl}
               alt="profile"
               style={{
@@ -335,7 +312,7 @@ const ProfileComponent = ({ onBack }) => {
             />
           ) : (
             <div
-              onClick={showTelegramPopup}
+             onClick={handleAvatarClick}
               style={{
                 width: "120px",
                 height: "120px",
@@ -431,6 +408,83 @@ const ProfileComponent = ({ onBack }) => {
           }}
         />
       </div>
+
+      <Drawer
+        title=" "
+        placement="bottom"
+        onClose={handleCancelPhoto}
+        open={showPhotoMenu}
+        height="auto"
+        contentWrapperStyle={{
+          maxWidth: "600px",
+          margin: "0 auto",
+          left: "6px",
+          right: "6px",
+          width: "auto",
+          borderTopLeftRadius: "10px",
+          borderTopRightRadius: "10px",
+          overflow: "hidden",
+        }}
+        bodyStyle={{
+          padding: "0",
+        }}
+        headerStyle={{ display: "none" }}
+        style={{
+          background: "transparent",
+        }}
+        maskStyle={{
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          {/* Кнопка "Сделать фото" */}
+          <div
+            style={{
+              padding: "20px",
+              borderBottom: "1px solid #E5E5E5",
+              color: "#007AFF",
+              fontSize: "16px",
+              fontWeight: "500",
+              cursor: "pointer",
+              backgroundColor: "#FFFFFF",
+            }}
+            onClick={handleTakePhoto}
+          >
+            Сделать фото
+          </div>
+
+          {/* Кнопка "Выбрать из галереи" */}
+          <div
+            style={{
+              padding: "20px",
+              borderBottom: "1px solid #E5E5E5",
+              color: "#007AFF",
+              fontSize: "16px",
+              fontWeight: "500",
+              cursor: "pointer",
+              backgroundColor: "#FFFFFF",
+            }}
+            onClick={handleChooseFromGallery}
+          >
+            Выбрать из галереи
+          </div>
+
+          {/* Кнопка "Отменить" */}
+          <div
+            style={{
+              padding: "20px",
+              color: "#FF3B30",
+              fontSize: "16px",
+              fontWeight: "500",
+              cursor: "pointer",
+              backgroundColor: "#FFFFFF",
+            }}
+            onClick={handleCancelPhoto}
+          >
+            Отменить
+          </div>
+        </div>
+      </Drawer>
 
       {showFixedButtons && (
         <FixedButtons
