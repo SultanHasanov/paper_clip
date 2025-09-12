@@ -81,12 +81,9 @@ const ProfileComponent = ({ onBack }) => {
     try {
       setIsPhotoLoading(true);
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "user", // предпочтительно фронтальная камера
-        },
+        video: { facingMode: "user" },
       });
 
-      // Создаем контейнер для камеры
       const cameraContainer = document.createElement("div");
       cameraContainer.id = "camera-container";
       cameraContainer.style.cssText = `
@@ -109,14 +106,13 @@ const ProfileComponent = ({ onBack }) => {
       video.muted = true;
       video.srcObject = stream;
       video.style.cssText = `
-      width: 90%;
-      max-width: 400px;
-      height: auto;
-      border-radius: 10px;
-      object-fit: cover;
-    `;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  object-fit: cover;
+  transform: scaleX(-1);
+`;
 
-      // Контейнер для кнопок
       const buttonContainer = document.createElement("div");
       buttonContainer.style.cssText = `
       display: flex;
@@ -124,21 +120,8 @@ const ProfileComponent = ({ onBack }) => {
       margin-top: 20px;
     `;
 
-      const captureBtn = document.createElement("button");
-      captureBtn.innerHTML = "📸 Сделать снимок";
-      captureBtn.style.cssText = `
-      background: #007AFF;
-      color: white;
-      border: none;
-      padding: 15px 20px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      font-weight: 500;
-    `;
-
       const cancelBtn = document.createElement("button");
-      cancelBtn.innerHTML = "❌ Отменить";
+      cancelBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Отменить`;
       cancelBtn.style.cssText = `
       background: #FF3B30;
       color: white;
@@ -148,79 +131,71 @@ const ProfileComponent = ({ onBack }) => {
       font-size: 16px;
       cursor: pointer;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     `;
 
-      // Функция очистки
+      const captureBtn = document.createElement("button");
+      captureBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-camera-icon lucide-camera"><path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z"/><circle cx="12" cy="13" r="3"/></svg> Сделать снимок`;
+      captureBtn.style.cssText = `
+      background: #007AFF;
+      color: white;
+      border: none;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    `;
+
       const cleanup = () => {
         stream.getTracks().forEach((track) => track.stop());
-        if (cameraContainer.parentNode) {
-          cameraContainer.remove();
-        }
+        cameraContainer.remove();
         setIsPhotoLoading(false);
       };
 
-      // Обработчик кнопки съемки
       captureBtn.onclick = () => {
-        try {
-          const canvas = document.createElement("canvas");
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
 
-          const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
-          setPhotoUrl(dataUrl);
-          cleanup();
-          message.success("Фото сделано!");
-        } catch (err) {
-          console.error("Ошибка при создании снимка:", err);
-          message.error("Ошибка при создании снимка");
-          cleanup();
-        }
+        // Отзеркаливаем по горизонтали
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        setPhotoUrl(canvas.toDataURL("image/jpeg", 0.8));
+        cleanup();
+        setShowPhotoMenu(false);
+        message.success("Фото сделано!");
       };
 
-      // Обработчик кнопки отмены
       cancelBtn.onclick = cleanup;
 
-      // Собираем интерфейс
-      buttonContainer.appendChild(captureBtn);
       buttonContainer.appendChild(cancelBtn);
+      buttonContainer.appendChild(captureBtn);
       cameraContainer.appendChild(video);
       cameraContainer.appendChild(buttonContainer);
 
-      // Ждем загрузки видео перед показом интерфейса
-      const waitForVideo = new Promise((resolve, reject) => {
-        video.onloadedmetadata = () => {
-          video.play().then(resolve).catch(reject);
-        };
-        video.onerror = reject;
-
-        // Таймаут на случай зависания
+      await new Promise((resolve, reject) => {
+        video.onloadedmetadata = () => video.play().then(resolve).catch(reject);
         setTimeout(() => reject(new Error("Timeout")), 10000);
       });
 
-      await waitForVideo;
-
-      // Показываем интерфейс камеры
       document.body.appendChild(cameraContainer);
       setIsPhotoLoading(false);
     } catch (err) {
       console.error("Ошибка доступа к камере:", err);
       setIsPhotoLoading(false);
-
-      if (err.name === "NotAllowedError") {
-        message.error(
-          "Доступ к камере запрещен. Разрешите использование камеры в настройках браузера."
-        );
-      } else if (err.name === "NotFoundError") {
-        message.error("Камера не найдена");
-      } else {
-        message.error("Ошибка доступа к камере");
-      }
+      message.error("Ошибка доступа к камере");
+      setShowPhotoMenu(false);
     }
-    setShowPhotoMenu(false);
   };
-
   const handleChooseFromGallery = () => {
     // Активируем скрытый input для выбора файла
     if (fileInputRef.current) {
