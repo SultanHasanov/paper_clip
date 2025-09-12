@@ -14,6 +14,7 @@ const ProfileComponent = ({ onBack }) => {
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const [showPhotoMenu, setShowPhotoMenu] = useState(false);
   const fileInputRef = useRef(null);
+  const [showFixedButtons, setShowFixedButtons] = useState(true);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
@@ -28,23 +29,17 @@ const ProfileComponent = ({ onBack }) => {
   }, []);
 
   useEffect(() => {
-  const handleFocus = () => {
-    const tg = window.Telegram?.WebApp;
-    tg?.expand();
-  };
+    const initialHeight = window.innerHeight;
 
-  // Добавляем обработчики для всех полей ввода
-  const inputs = document.querySelectorAll('input, textarea');
-  inputs.forEach(input => {
-    input.addEventListener('focus', handleFocus);
-  });
+    const handleResize = () => {
+      const currentHeight = window.innerHeight;
+      // Если высота уменьшилась больше чем на 150px, скрываем кнопки
+      setShowFixedButtons(currentHeight > initialHeight - 150);
+    };
 
-  return () => {
-    inputs.forEach(input => {
-      input.removeEventListener('focus', handleFocus);
-    });
-  };
-}, []);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (photoUrl) {
@@ -82,59 +77,58 @@ const ProfileComponent = ({ onBack }) => {
     setShowPhotoMenu(true);
   };
 
- const handleTakePhoto = async () => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    
-    const video = document.createElement('video');
-    video.autoplay = true;
-    video.playsInline = true;
-    video.muted = true; // обязательно для автозапуска
-    video.srcObject = stream;
-    video.style.width = "100%";
-    video.style.maxHeight = "400px";
-    
-    // ждём готовности
-    video.onloadedmetadata = async () => {
-      try {
-        await video.play();
-      } catch (err) {
-        console.error("Не удалось воспроизвести видео:", err);
-      }
-    };
+  const handleTakePhoto = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 
-    document.body.appendChild(video);
+      const video = document.createElement("video");
+      video.autoplay = true;
+      video.playsInline = true;
+      video.muted = true; // обязательно для автозапуска
+      video.srcObject = stream;
+      video.style.width = "100%";
+      video.style.maxHeight = "400px";
 
-    const captureBtn = document.createElement('button');
-    captureBtn.innerText = "📸 Сделать снимок";
-    captureBtn.style.display = "block";
-    captureBtn.style.margin = "20px auto";
-    document.body.appendChild(captureBtn);
+      // ждём готовности
+      video.onloadedmetadata = async () => {
+        try {
+          await video.play();
+        } catch (err) {
+          console.error("Не удалось воспроизвести видео:", err);
+        }
+      };
 
-    captureBtn.onclick = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      document.body.appendChild(video);
 
-      const dataUrl = canvas.toDataURL("image/png");
-      setPhotoUrl(dataUrl);
+      const captureBtn = document.createElement("button");
+      captureBtn.innerText = "📸 Сделать снимок";
+      captureBtn.style.display = "block";
+      captureBtn.style.margin = "20px auto";
+      document.body.appendChild(captureBtn);
 
-      // Останавливаем камеру
-      stream.getTracks().forEach(track => track.stop());
+      captureBtn.onclick = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Убираем временные элементы
-      video.remove();
-      captureBtn.remove();
-    };
-  } catch (err) {
-    message.error("Ошибка доступа к камере");
-    console.error(err);
-  }
-  setShowPhotoMenu(false);
-};
+        const dataUrl = canvas.toDataURL("image/png");
+        setPhotoUrl(dataUrl);
 
+        // Останавливаем камеру
+        stream.getTracks().forEach((track) => track.stop());
+
+        // Убираем временные элементы
+        video.remove();
+        captureBtn.remove();
+      };
+    } catch (err) {
+      message.error("Ошибка доступа к камере");
+      console.error(err);
+    }
+    setShowPhotoMenu(false);
+  };
 
   const handleChooseFromGallery = () => {
     // Активируем скрытый input для выбора файла
@@ -155,14 +149,14 @@ const ProfileComponent = ({ onBack }) => {
 
   const processImageFile = (file) => {
     setIsPhotoLoading(true);
-    
+
     const reader = new FileReader();
     reader.onload = (e) => {
       setPhotoUrl(e.target.result);
       setIsPhotoLoading(false);
     };
     reader.onerror = () => {
-      message.error('Ошибка загрузки изображения');
+      message.error("Ошибка загрузки изображения");
       setIsPhotoLoading(false);
     };
     reader.readAsDataURL(file);
@@ -269,7 +263,7 @@ const ProfileComponent = ({ onBack }) => {
         accept="image/*"
         ref={fileInputRef}
         onChange={handleFileSelect}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
       />
 
       {/* Name Input */}
@@ -416,17 +410,19 @@ const ProfileComponent = ({ onBack }) => {
         </div>
       </Drawer>
 
-      <FixedButtons
-        onNext={handleProfileComplete}
-        onBack={onBack}
-        nextButtonText="Далее"
-        nextButtonStyle={{
-          backgroundColor: "#7A7A7A",
-          borderColor: "#7A7A7A",
-          color: "#FFFFFF",
-        }}
-        showBackButton={true}
-      />
+      {showFixedButtons && (
+        <FixedButtons
+          onNext={handleProfileComplete}
+          onBack={onBack}
+          nextButtonText="Далее"
+          nextButtonStyle={{
+            backgroundColor: "#7A7A7A",
+            borderColor: "#7A7A7A",
+            color: "#FFFFFF",
+          }}
+          showBackButton={true}
+        />
+      )}
     </div>
   );
 };
