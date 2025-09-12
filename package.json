@@ -21,6 +21,7 @@
     "vite": "^7.1.2"
   },
   "dependencies": {
+    "@telegram-apps/sdk": "^3.11.5",
     "@twa-dev/sdk": "^8.0.2",
     "antd": "^5.27.1",
     "axios": "^1.11.0",

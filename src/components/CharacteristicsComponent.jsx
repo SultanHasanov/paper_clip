@@ -1,9 +1,9 @@
 // components/CharacteristicsComponent.jsx
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Tag, Input, Space, Typography } from "antd";
 import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
 import ProgressBar from "./ProgressBar";
-import TelegramButtons from "./TelegramButtons";
+import FixedButtons from "./FixedButtons";
 
 const { Title, Text } = Typography;
 
@@ -18,7 +18,8 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
   const [showFixedButtons, setShowFixedButtons] = useState(true);
 
   useEffect(() => {
-    const input = document.querySelector("input");
+    const input = document.querySelector("input"); // у вас один основной input для поиска
+
     if (!input) return;
 
     const handleFocus = () => setShowFixedButtons(false);
@@ -32,14 +33,6 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
       input.removeEventListener("blur", handleBlur);
     };
   }, []);
-
-  const handleNext = useCallback(() => {
-    onNext(selectedCharacteristics);
-  }, [onNext, selectedCharacteristics]);
-
-  const handleBack = useCallback(() => {
-    onBack();
-  }, [onBack]);
 
   const recommendedCharacteristics = [
     "Люблю животных",
@@ -85,7 +78,7 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
         margin: "0 auto",
         minHeight: "100vh",
         position: "relative",
-        paddingBottom: "20px", // Уменьшили отступ снизу
+        paddingBottom: "100px",
       }}
     >
       <ProgressBar currentStep={2} totalSteps={3} />
@@ -234,14 +227,14 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
         </Space>
       </Card>
 
-      {/* Используем Telegram кнопки вместо кастомных */}
-      <TelegramButtons
-        onNext={handleNext}
-        onBack={handleBack}
-        nextButtonText="Далее"
-        showBackButton={true}
-        isNextEnabled={selectedCharacteristics.length > 0}
-      />
+      {showFixedButtons && (
+        <FixedButtons
+          onNext={() => onNext(selectedCharacteristics)}
+          onBack={onBack}
+          nextButtonText="Далее"
+          showBackButton={true}
+        />
+      )}
     </div>
   );
 };
