@@ -26,60 +26,7 @@ const ProfileComponent = ({ onBack }) => {
     }
   }, []);
 
-  // Настройка кнопок Telegram WebApp
-  useEffect(() => {
-    const tg = window.Telegram?.WebApp;
-    if (!tg) return;
-
-    // Показываем главную кнопку
-    tg.MainButton.setText("Далее");
-    tg.MainButton.color = "#7A7A7A";
-    tg.MainButton.textColor = "#FFFFFF";
-    tg.MainButton.show();
-
-    // Показываем кнопку "Назад"
-    tg.BackButton.show();
-
-    // Обработчик для главной кнопки
-    const handleMainButton = () => {
-      handleProfileComplete();
-    };
-
-    // Обработчик для кнопки "Назад"
-    const handleBackButton = () => {
-      if (onBack) {
-        onBack();
-      }
-    };
-
-    // Подписываемся на события
-    tg.MainButton.onClick(handleMainButton);
-    tg.BackButton.onClick(handleBackButton);
-
-    // Очистка при размонтировании компонента
-    return () => {
-      tg.MainButton.offClick(handleMainButton);
-      tg.BackButton.offClick(handleBackButton);
-      tg.MainButton.hide();
-      tg.BackButton.hide();
-    };
-  }, [onBack]);
-
-  // Обновление состояния главной кнопки в зависимости от заполненности формы
-  useEffect(() => {
-    const tg = window.Telegram?.WebApp;
-    if (!tg) return;
-
-    const isFormValid = name.trim() !== "" && birthDate.length >= 8;
-    
-    if (isFormValid) {
-      tg.MainButton.color = "#007AFF";
-      tg.MainButton.enable();
-    } else {
-      tg.MainButton.color = "#7A7A7A";
-      tg.MainButton.disable();
-    }
-  }, [name, birthDate]);
+// Удаляем все useEffect связанные с Telegram WebApp кнопками, так как возвращаем FixedButtons
 
   useEffect(() => {
     if (photoUrl) {
