@@ -1,8 +1,7 @@
 // components/ProfileComponent.jsx
 import React, { useEffect, useState, useRef } from "react";
-import { Input, Typography, Spin, message } from "antd";
+import { Input, Typography, Spin, Drawer, message } from "antd";
 import ProgressBar from "./ProgressBar";
-import FixedButtons from "./FixedButtons";
 
 const { Title, Text } = Typography;
 
@@ -14,7 +13,6 @@ const ProfileComponent = ({ onBack }) => {
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const [showPhotoMenu, setShowPhotoMenu] = useState(false);
   const fileInputRef = useRef(null);
-  const [showFixedButtons, setShowFixedButtons] = useState(true);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
@@ -28,48 +26,60 @@ const ProfileComponent = ({ onBack }) => {
     }
   }, []);
 
+  // Настройка кнопок Telegram WebApp
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (!tg) return;
 
-    tg.BottomBar.show();
-    tg.BottomBar.setItems([
-      { id: "take_photo", text: "📸 Сделать фото" },
-      { id: "gallery", text: "🖼 Выбрать из галереи" },
-      { id: "cancel", text: "❌ Отменить" },
-    ]);
+    // Показываем главную кнопку
+    tg.MainButton.setText("Далее");
+    tg.MainButton.color = "#7A7A7A";
+    tg.MainButton.textColor = "#FFFFFF";
+    tg.MainButton.show();
 
-    const handleBottomBarClick = (buttonId) => {
-      if (buttonId === "take_photo") {
-        handleTakePhoto();
-      } else if (buttonId === "gallery") {
-        handleChooseFromGallery();
-      } else if (buttonId === "cancel") {
-        tg.BottomBar.hide();
+    // Показываем кнопку "Назад"
+    tg.BackButton.show();
+
+    // Обработчик для главной кнопки
+    const handleMainButton = () => {
+      handleProfileComplete();
+    };
+
+    // Обработчик для кнопки "Назад"
+    const handleBackButton = () => {
+      if (onBack) {
+        onBack();
       }
     };
 
-    tg.onEvent("bottom_bar_button_click", handleBottomBarClick);
+    // Подписываемся на события
+    tg.MainButton.onClick(handleMainButton);
+    tg.BackButton.onClick(handleBackButton);
 
-    // Очистка при размонтировании
+    // Очистка при размонтировании компонента
     return () => {
-      tg.offEvent("bottom_bar_button_click", handleBottomBarClick);
-      tg.BottomBar.hide();
+      tg.MainButton.offClick(handleMainButton);
+      tg.BackButton.offClick(handleBackButton);
+      tg.MainButton.hide();
+      tg.BackButton.hide();
     };
-  }, [showPhotoMenu]);
+  }, [onBack]);
 
+  // Обновление состояния главной кнопки в зависимости от заполненности формы
   useEffect(() => {
-    const initialHeight = window.innerHeight;
+    const tg = window.Telegram?.WebApp;
+    if (!tg) return;
 
-    const handleResize = () => {
-      const currentHeight = window.innerHeight;
-      // Если высота уменьшилась больше чем на 150px, скрываем кнопки
-      setShowFixedButtons(currentHeight > initialHeight - 150);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    const isFormValid = name.trim() !== "" && birthDate.length >= 8;
+    
+    if (isFormValid) {
+      tg.MainButton.color = "#007AFF";
+      tg.MainButton.enable();
+    } else {
+      tg.MainButton.color = "#7A7A7A";
+      tg.MainButton.disable();
+    }
+  }, [name, birthDate]);
 
   useEffect(() => {
     if (photoUrl) {
@@ -100,12 +110,27 @@ const ProfileComponent = ({ onBack }) => {
   };
 
   const handleProfileComplete = () => {
-    alert("Профиль создан!");
+    const tg = window.Telegram?.WebApp;
+    
+    // Показываем индикатор загрузки
+    if (tg) {
+      tg.MainButton.showProgress();
+    }
+
+    // Симулируем отправку данных
+    setTimeout(() => {
+      if (tg) {
+        tg.MainButton.hideProgress();
+        // Показываем уведомление через Telegram WebApp
+        tg.showAlert("Профиль создан!");
+      } else {
+        alert("Профиль создан!");
+      }
+    }, 1500);
   };
 
   const handleAvatarClick = () => {
-    const tg = window.Telegram?.WebApp;
-    tg?.BottomBar.show();
+    setShowPhotoMenu(true);
   };
 
   const handleTakePhoto = async () => {
@@ -228,8 +253,8 @@ const ProfileComponent = ({ onBack }) => {
       setShowPhotoMenu(false);
     }
   };
+
   const handleChooseFromGallery = () => {
-    // Активируем скрытый input для выбора файла
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -241,7 +266,6 @@ const ProfileComponent = ({ onBack }) => {
     if (file) {
       processImageFile(file);
     }
-    // Сбрасываем значение, чтобы можно было выбрать тот же файл снова
     e.target.value = null;
   };
 
@@ -273,7 +297,7 @@ const ProfileComponent = ({ onBack }) => {
         margin: "0 auto",
         minHeight: "100vh",
         position: "relative",
-        paddingBottom: "100px",
+        paddingBottom: "20px", // Уменьшили отступ снизу, так как кнопки теперь нативные
         filter: showPhotoMenu ? "blur(2.5px)" : "none",
         transition: "filter 0.3s ease",
       }}
@@ -327,7 +351,7 @@ const ProfileComponent = ({ onBack }) => {
             </div>
           ) : photoUrl ? (
             <img
-              onClick={handleAvatarClick}
+             onClick={handleAvatarClick}
               src={photoUrl}
               alt="profile"
               style={{
@@ -337,12 +361,12 @@ const ProfileComponent = ({ onBack }) => {
                 objectFit: "cover",
                 margin: "0 auto",
                 display: "block",
-                cursor: "pointer",
+                cursor: "pointer"
               }}
             />
           ) : (
             <div
-              onClick={handleAvatarClick}
+             onClick={handleAvatarClick}
               style={{
                 width: "120px",
                 height: "120px",
@@ -354,7 +378,7 @@ const ProfileComponent = ({ onBack }) => {
                 justifyContent: "center",
                 fontSize: "40px",
                 color: "#000",
-                cursor: "pointer",
+                cursor: "pointer"
               }}
             >
               👤
@@ -438,19 +462,83 @@ const ProfileComponent = ({ onBack }) => {
           }}
         />
       </div>
-      {showFixedButtons && (
-        <FixedButtons
-          onNext={handleProfileComplete}
-          onBack={onBack}
-          nextButtonText="Далее"
-          nextButtonStyle={{
-            backgroundColor: "#7A7A7A",
-            borderColor: "#7A7A7A",
-            color: "#FFFFFF",
-          }}
-          showBackButton={true}
-        />
-      )}
+
+      <Drawer
+        title=" "
+        placement="bottom"
+        onClose={handleCancelPhoto}
+        open={showPhotoMenu}
+        height="auto"
+        contentWrapperStyle={{
+          maxWidth: "600px",
+          margin: "0 auto",
+          left: "6px",
+          right: "6px",
+          width: "auto",
+          borderTopLeftRadius: "10px",
+          borderTopRightRadius: "10px",
+          overflow: "hidden",
+        }}
+        bodyStyle={{
+          padding: "0",
+        }}
+        headerStyle={{ display: "none" }}
+        style={{
+          background: "transparent",
+        }}
+        maskStyle={{
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          {/* Кнопка "Сделать фото" */}
+          <div
+            style={{
+              padding: "20px",
+              borderBottom: "1px solid #E5E5E5",
+              color: "#007AFF",
+              fontSize: "16px",
+              fontWeight: "500",
+              cursor: "pointer",
+              backgroundColor: "#FFFFFF",
+            }}
+            onClick={handleTakePhoto}
+          >
+            Сделать фото
+          </div>
+
+          {/* Кнопка "Выбрать из галереи" */}
+          <div
+            style={{
+              padding: "20px",
+              borderBottom: "1px solid #E5E5E5",
+              color: "#007AFF",
+              fontSize: "16px",
+              fontWeight: "500",
+              cursor: "pointer",
+              backgroundColor: "#FFFFFF",
+            }}
+            onClick={handleChooseFromGallery}
+          >
+            Выбрать из галереи
+          </div>
+
+          {/* Кнопка "Отменить" */}
+          <div
+            style={{
+              padding: "20px",
+              color: "#FF3B30",
+              fontSize: "16px",
+              fontWeight: "500",
+              cursor: "pointer",
+              backgroundColor: "#FFFFFF",
+            }}
+            onClick={handleCancelPhoto}
+          >
+            Отменить
+          </div>
+        </div>
+      </Drawer>
     </div>
   );
 };
