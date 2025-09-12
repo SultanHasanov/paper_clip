@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Input, Typography, Spin, Drawer, message } from "antd";
 import ProgressBar from "./ProgressBar";
+import FixedButtons from "./FixedButtons";
 
 const { Title, Text } = Typography;
 
@@ -13,6 +14,7 @@ const ProfileComponent = ({ onBack }) => {
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const [showPhotoMenu, setShowPhotoMenu] = useState(false);
   const fileInputRef = useRef(null);
+  const [showFixedButtons, setShowFixedButtons] = useState(true);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
@@ -26,57 +28,18 @@ const ProfileComponent = ({ onBack }) => {
     }
   }, []);
 
-  // Настройка Telegram WebApp кнопок
   useEffect(() => {
-    const tg = window.Telegram?.WebApp;
-    if (!tg) return;
+    const initialHeight = window.innerHeight;
 
-    // Настраиваем MainButton
-    tg.MainButton.text = "Создать профиль";
-    tg.MainButton.color = "#7A7A7A";
-    tg.MainButton.textColor = "#FFFFFF";
-    tg.MainButton.show();
-
-    // Показываем BackButton
-    tg.BackButton.show();
-
-    // Обработчики событий
-    const handleMainButtonClick = () => {
-      handleProfileComplete();
+    const handleResize = () => {
+      const currentHeight = window.innerHeight;
+      // Если высота уменьшилась больше чем на 150px, скрываем кнопки
+      setShowFixedButtons(currentHeight > initialHeight - 150);
     };
 
-    const handleBackButtonClick = () => {
-      onBack();
-    };
-
-    // Привязываем обработчики
-    tg.MainButton.onClick(handleMainButtonClick);
-    tg.BackButton.onClick(handleBackButtonClick);
-
-    // Cleanup при размонтировании компонента
-    return () => {
-      tg.MainButton.hide();
-      tg.BackButton.hide();
-      tg.MainButton.offClick(handleMainButtonClick);
-      tg.BackButton.offClick(handleBackButtonClick);
-    };
-  }, [onBack]);
-
-  // Обновляем состояние MainButton в зависимости от заполненности формы
-  useEffect(() => {
-    const tg = window.Telegram?.WebApp;
-    if (!tg) return;
-
-    const isFormValid = name.trim() && birthDate.trim() && about.trim();
-    
-    if (isFormValid) {
-      tg.MainButton.color = "#007AFF"; // Активный цвет
-      tg.MainButton.enable();
-    } else {
-      tg.MainButton.color = "#7A7A7A"; // Неактивный цвет
-      tg.MainButton.disable();
-    }
-  }, [name, birthDate, about]);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (photoUrl) {
@@ -107,39 +70,10 @@ const ProfileComponent = ({ onBack }) => {
   };
 
   const handleProfileComplete = () => {
-    const tg = window.Telegram?.WebApp;
-    
-    // Показываем индикатор загрузки
-    if (tg) {
-      tg.MainButton.showProgress();
-    }
-
-    // Имитация отправки данных
-    setTimeout(() => {
-      if (tg) {
-        tg.MainButton.hideProgress();
-      }
-      
-      // Показываем HapticFeedback для успешного действия
-      if (tg?.HapticFeedback) {
-        tg.HapticFeedback.notificationOccurred('success');
-      }
-      
-      message.success("Профиль создан!");
-      
-      // Здесь можно перейти к следующему экрану или закрыть WebApp
-      // tg?.close();
-    }, 1500);
+    alert("Профиль создан!");
   };
 
   const handleAvatarClick = () => {
-    const tg = window.Telegram?.WebApp;
-    
-    // Легкий тактильный отклик при клике
-    if (tg?.HapticFeedback) {
-      tg.HapticFeedback.impactOccurred('light');
-    }
-    
     setShowPhotoMenu(true);
   };
 
@@ -238,13 +172,6 @@ const ProfileComponent = ({ onBack }) => {
         setPhotoUrl(canvas.toDataURL("image/jpeg", 0.8));
         cleanup();
         setShowPhotoMenu(false);
-        
-        // Тактильный отклик при успешном снимке
-        const tg = window.Telegram?.WebApp;
-        if (tg?.HapticFeedback) {
-          tg.HapticFeedback.notificationOccurred('success');
-        }
-        
         message.success("Фото сделано!");
       };
 
@@ -270,8 +197,8 @@ const ProfileComponent = ({ onBack }) => {
       setShowPhotoMenu(false);
     }
   };
-  
   const handleChooseFromGallery = () => {
+    // Активируем скрытый input для выбора файла
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -283,6 +210,7 @@ const ProfileComponent = ({ onBack }) => {
     if (file) {
       processImageFile(file);
     }
+    // Сбрасываем значение, чтобы можно было выбрать тот же файл снова
     e.target.value = null;
   };
 
@@ -293,12 +221,6 @@ const ProfileComponent = ({ onBack }) => {
     reader.onload = (e) => {
       setPhotoUrl(e.target.result);
       setIsPhotoLoading(false);
-      
-      // Тактильный отклик при успешной загрузке
-      const tg = window.Telegram?.WebApp;
-      if (tg?.HapticFeedback) {
-        tg.HapticFeedback.notificationOccurred('success');
-      }
     };
     reader.onerror = () => {
       message.error("Ошибка загрузки изображения");
@@ -320,7 +242,7 @@ const ProfileComponent = ({ onBack }) => {
         margin: "0 auto",
         minHeight: "100vh",
         position: "relative",
-        paddingBottom: "20px", // Уменьшили отступ снизу, так как кнопки теперь встроенные
+        paddingBottom: "100px",
         filter: showPhotoMenu ? "blur(2.5px)" : "none",
         transition: "filter 0.3s ease",
       }}
@@ -375,6 +297,7 @@ const ProfileComponent = ({ onBack }) => {
           ) : photoUrl ? (
             <img
              onClick={handleAvatarClick}
+
               src={photoUrl}
               alt="profile"
               style={{
@@ -562,6 +485,20 @@ const ProfileComponent = ({ onBack }) => {
           </div>
         </div>
       </Drawer>
+
+      {showFixedButtons && (
+        <FixedButtons
+          onNext={handleProfileComplete}
+          onBack={onBack}
+          nextButtonText="Далее"
+          nextButtonStyle={{
+            backgroundColor: "#7A7A7A",
+            borderColor: "#7A7A7A",
+            color: "#FFFFFF",
+          }}
+          showBackButton={true}
+        />
+      )}
     </div>
   );
 };
