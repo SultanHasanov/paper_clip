@@ -1,11 +1,11 @@
 import './App.css'
-import DatingGoalsComponent from './components/DatingGoalsComponent'
+import DatingApp from './components/DatingApp'
 
 function App() {
 
   return (
     <>
-     <DatingGoalsComponent/>
+     <DatingApp/>
     </>
   )
 }

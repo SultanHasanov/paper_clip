@@ -1,51 +1,54 @@
-// components/DatingGoalsComponent.jsx
+// components/CharacteristicsComponent.jsx
 import React, { useState } from "react";
-import { Card, Tag, Input, Button, Space, Typography } from "antd";
+import { Card, Tag, Input, Space, Typography } from "antd";
 import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
 import ProgressBar from "./ProgressBar";
 import FixedButtons from "./FixedButtons";
 
 const { Title, Text } = Typography;
 
-const DatingGoalsComponent = ({ onNext }) => {
-  const [selectedGoals, setSelectedGoals] = useState([
-    "Кино или театр",
-    "Путешествие",
-    "Прогулки",
-    "Бильярд",
-    "Спорт",
+const CharacteristicsComponent = ({ onNext, onBack }) => {
+  const [selectedCharacteristics, setSelectedCharacteristics] = useState([
+    "Программист",
+    "С чувством юмора",
+    "Воронеж",
+    "Вегетарианец",
   ]);
   const [searchValue, setSearchValue] = useState("");
 
-  const recommendedGoals = [
-    "Путешествие",
-    "Прогулка",
-    "Йога",
-    "Концерт",
-    "Бокс",
-    "Спорт",
-    "Походы и трекинг",
-    "Совместная поездка",
-    "Бильярд",
-    "Йога",
-    "Музеи и выставки",
-    "Совместные хобби",
+  const recommendedCharacteristics = [
+    "Люблю животных",
+    "Общительный",
+    "Москва",
+    "Оптимистичный",
+    "Домосед",
+    "Санкт Петербург",
+    "Творческий",
+    "ЗОЖ",
+    "Геймер",
+    "Путешественник",
+    "Сладкоежка",
   ];
 
-  const handleRemoveGoal = (goalToRemove) => {
-    setSelectedGoals(selectedGoals.filter((goal) => goal !== goalToRemove));
+  const handleRemoveCharacteristic = (characteristicToRemove) => {
+    setSelectedCharacteristics(
+      selectedCharacteristics.filter((char) => char !== characteristicToRemove)
+    );
   };
 
-  const handleAddGoal = (goalToAdd) => {
-    if (!selectedGoals.includes(goalToAdd)) {
-      setSelectedGoals([...selectedGoals, goalToAdd]);
+  const handleAddCharacteristic = (characteristicToAdd) => {
+    if (!selectedCharacteristics.includes(characteristicToAdd)) {
+      setSelectedCharacteristics([
+        ...selectedCharacteristics,
+        characteristicToAdd,
+      ]);
     }
   };
 
-  const filteredRecommended = recommendedGoals.filter(
-    (goal) =>
-      !selectedGoals.includes(goal) &&
-      goal.toLowerCase().includes(searchValue.toLowerCase())
+  const filteredRecommended = recommendedCharacteristics.filter(
+    (char) =>
+      !selectedCharacteristics.includes(char) &&
+      char.toLowerCase().includes(searchValue.toLowerCase())
   );
 
   return (
@@ -60,10 +63,10 @@ const DatingGoalsComponent = ({ onNext }) => {
         paddingBottom: "100px",
       }}
     >
-      <ProgressBar currentStep={1} totalSteps={3} />
+      <ProgressBar currentStep={2} totalSteps={3} />
 
       <div
-        style={{ textAlign: "center", marginBottom: "20px", padding: "0 25px" }}
+        style={{ textAlign: "center", marginBottom: "20px", padding: "0 10px" }}
       >
         <Title
           level={2}
@@ -74,7 +77,7 @@ const DatingGoalsComponent = ({ onNext }) => {
             marginBottom: "16px",
           }}
         >
-          Цели знакомства
+          Мои характеристики
         </Title>
         <Text
           style={{
@@ -85,8 +88,8 @@ const DatingGoalsComponent = ({ onNext }) => {
             fontWeight: 200,
           }}
         >
-          Выберите какие цели знакомства вам интересны. Это поможет подобрать
-          людей с похожими интересами
+          Выберите ваши характеристики. Это поможет подобрать людей с похожими
+          интересами
         </Text>
       </div>
 
@@ -107,15 +110,15 @@ const DatingGoalsComponent = ({ onNext }) => {
             fontSize: "clamp(18px, 3.5vw, 18px)",
           }}
         >
-          Мои цели
+          Мои характеристики
         </Title>
 
         <Space size={[0, 6]} wrap style={{ marginBottom: "16px" }}>
-          {selectedGoals.map((goal, index) => (
+          {selectedCharacteristics.map((char, index) => (
             <Tag
               key={index}
               closable
-              onClose={() => handleRemoveGoal(goal)}
+              onClose={() => handleRemoveCharacteristic(char)}
               closeIcon={
                 <CloseOutlined
                   style={{ fontSize: "10px", marginLeft: 10, color: "#404040" }}
@@ -132,7 +135,7 @@ const DatingGoalsComponent = ({ onNext }) => {
                 height: "auto",
               }}
             >
-              {goal}
+              {char}
             </Tag>
           ))}
         </Space>
@@ -184,10 +187,10 @@ const DatingGoalsComponent = ({ onNext }) => {
         </Title>
 
         <Space size={[0, 6]} wrap>
-          {filteredRecommended.map((goal, index) => (
+          {filteredRecommended.map((char, index) => (
             <Tag
               key={index}
-              onClick={() => handleAddGoal(goal)}
+              onClick={() => handleAddCharacteristic(char)}
               style={{
                 backgroundColor: "#EFF0F2",
                 color: "#404040",
@@ -200,19 +203,20 @@ const DatingGoalsComponent = ({ onNext }) => {
                 cursor: "pointer",
               }}
             >
-              {goal}
+              {char}
             </Tag>
           ))}
         </Space>
       </Card>
 
       <FixedButtons
-        onNext={() => onNext(selectedGoals)}
+        onNext={() => onNext(selectedCharacteristics)}
+        onBack={onBack}
         nextButtonText="Далее"
-        showBackButton={false}
+        showBackButton={true}
       />
     </div>
   );
 };
 
-export default DatingGoalsComponent;
+export default CharacteristicsComponent;
