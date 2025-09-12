@@ -79,53 +79,144 @@ const ProfileComponent = ({ onBack }) => {
 
   const handleTakePhoto = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setIsPhotoLoading(true);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user", // предпочтительно фронтальная камера
+        },
+      });
+
+      // Создаем контейнер для камеры
+      const cameraContainer = document.createElement("div");
+      cameraContainer.id = "camera-container";
+      cameraContainer.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    `;
 
       const video = document.createElement("video");
       video.autoplay = true;
       video.playsInline = true;
-      video.muted = true; // обязательно для автозапуска
+      video.muted = true;
       video.srcObject = stream;
-      video.style.width = "100%";
-      video.style.maxHeight = "400px";
+      video.style.cssText = `
+      width: 90%;
+      max-width: 400px;
+      height: auto;
+      border-radius: 10px;
+      object-fit: cover;
+    `;
 
-      // ждём готовности
-      video.onloadedmetadata = async () => {
+      // Контейнер для кнопок
+      const buttonContainer = document.createElement("div");
+      buttonContainer.style.cssText = `
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+    `;
+
+      const captureBtn = document.createElement("button");
+      captureBtn.innerHTML = "📸 Сделать снимок";
+      captureBtn.style.cssText = `
+      background: #007AFF;
+      color: white;
+      border: none;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 500;
+    `;
+
+      const cancelBtn = document.createElement("button");
+      cancelBtn.innerHTML = "❌ Отменить";
+      cancelBtn.style.cssText = `
+      background: #FF3B30;
+      color: white;
+      border: none;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 500;
+    `;
+
+      // Функция очистки
+      const cleanup = () => {
+        stream.getTracks().forEach((track) => track.stop());
+        if (cameraContainer.parentNode) {
+          cameraContainer.remove();
+        }
+        setIsPhotoLoading(false);
+      };
+
+      // Обработчик кнопки съемки
+      captureBtn.onclick = () => {
         try {
-          await video.play();
+          const canvas = document.createElement("canvas");
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+          setPhotoUrl(dataUrl);
+          cleanup();
+          message.success("Фото сделано!");
         } catch (err) {
-          console.error("Не удалось воспроизвести видео:", err);
+          console.error("Ошибка при создании снимка:", err);
+          message.error("Ошибка при создании снимка");
+          cleanup();
         }
       };
 
-      document.body.appendChild(video);
+      // Обработчик кнопки отмены
+      cancelBtn.onclick = cleanup;
 
-      const captureBtn = document.createElement("button");
-      captureBtn.innerText = "📸 Сделать снимок";
-      captureBtn.style.display = "block";
-      captureBtn.style.margin = "20px auto";
-      document.body.appendChild(captureBtn);
+      // Собираем интерфейс
+      buttonContainer.appendChild(captureBtn);
+      buttonContainer.appendChild(cancelBtn);
+      cameraContainer.appendChild(video);
+      cameraContainer.appendChild(buttonContainer);
 
-      captureBtn.onclick = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      // Ждем загрузки видео перед показом интерфейса
+      const waitForVideo = new Promise((resolve, reject) => {
+        video.onloadedmetadata = () => {
+          video.play().then(resolve).catch(reject);
+        };
+        video.onerror = reject;
 
-        const dataUrl = canvas.toDataURL("image/png");
-        setPhotoUrl(dataUrl);
+        // Таймаут на случай зависания
+        setTimeout(() => reject(new Error("Timeout")), 10000);
+      });
 
-        // Останавливаем камеру
-        stream.getTracks().forEach((track) => track.stop());
+      await waitForVideo;
 
-        // Убираем временные элементы
-        video.remove();
-        captureBtn.remove();
-      };
+      // Показываем интерфейс камеры
+      document.body.appendChild(cameraContainer);
+      setIsPhotoLoading(false);
     } catch (err) {
-      message.error("Ошибка доступа к камере");
-      console.error(err);
+      console.error("Ошибка доступа к камере:", err);
+      setIsPhotoLoading(false);
+
+      if (err.name === "NotAllowedError") {
+        message.error(
+          "Доступ к камере запрещен. Разрешите использование камеры в настройках браузера."
+        );
+      } else if (err.name === "NotFoundError") {
+        message.error("Камера не найдена");
+      } else {
+        message.error("Ошибка доступа к камере");
+      }
     }
     setShowPhotoMenu(false);
   };
