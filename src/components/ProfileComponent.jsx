@@ -276,9 +276,10 @@ const ProfileComponent = ({ onBack }) => {
 
       {/* Profile Picture */}
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        <div onClick={handleAvatarClick} style={{ cursor: "pointer" }}>
+        <div>
           {isPhotoLoading ? (
             <div
+              onClick={handleAvatarClick}
               style={{
                 width: "120px",
                 height: "120px",
@@ -288,12 +289,15 @@ const ProfileComponent = ({ onBack }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                cursor: "pointer",
               }}
             >
               <Spin size="large" />
             </div>
           ) : photoUrl ? (
             <img
+             onClick={handleAvatarClick}
+
               src={photoUrl}
               alt="profile"
               style={{
@@ -303,10 +307,12 @@ const ProfileComponent = ({ onBack }) => {
                 objectFit: "cover",
                 margin: "0 auto",
                 display: "block",
+                cursor: "pointer"
               }}
             />
           ) : (
             <div
+             onClick={handleAvatarClick}
               style={{
                 width: "120px",
                 height: "120px",
@@ -318,6 +324,7 @@ const ProfileComponent = ({ onBack }) => {
                 justifyContent: "center",
                 fontSize: "40px",
                 color: "#000",
+                cursor: "pointer"
               }}
             >
               👤
