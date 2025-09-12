@@ -21,6 +21,7 @@
     "vite": "^7.1.2"
   },
   "dependencies": {
+    "@twa-dev/sdk": "^8.0.2",
     "antd": "^5.27.1",
     "axios": "^1.11.0",
     "react": "^18.3.1",
