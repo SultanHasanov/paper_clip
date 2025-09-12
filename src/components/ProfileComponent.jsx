@@ -28,6 +28,25 @@ const ProfileComponent = ({ onBack }) => {
   }, []);
 
   useEffect(() => {
+  const handleFocus = () => {
+    const tg = window.Telegram?.WebApp;
+    tg?.expand();
+  };
+
+  // Добавляем обработчики для всех полей ввода
+  const inputs = document.querySelectorAll('input, textarea');
+  inputs.forEach(input => {
+    input.addEventListener('focus', handleFocus);
+  });
+
+  return () => {
+    inputs.forEach(input => {
+      input.removeEventListener('focus', handleFocus);
+    });
+  };
+}, []);
+
+  useEffect(() => {
     if (photoUrl) {
       const img = new Image();
       img.onload = () => setIsPhotoLoading(false);

@@ -1,5 +1,5 @@
 // components/DatingGoalsComponent.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Tag, Input, Button, Space, Typography } from "antd";
 import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
 import ProgressBar from "./ProgressBar";
@@ -16,6 +16,25 @@ const DatingGoalsComponent = ({ onNext }) => {
     "Спорт",
   ]);
   const [searchValue, setSearchValue] = useState("");
+
+  useEffect(() => {
+    const handleFocus = () => {
+      const tg = window.Telegram?.WebApp;
+      tg?.expand();
+    };
+
+    // Добавляем обработчики для поля поиска
+    const inputs = document.querySelectorAll("input");
+    inputs.forEach((input) => {
+      input.addEventListener("focus", handleFocus);
+    });
+
+    return () => {
+      inputs.forEach((input) => {
+        input.removeEventListener("focus", handleFocus);
+      });
+    };
+  }, []);
 
   const recommendedGoals = [
     "Путешествие",
