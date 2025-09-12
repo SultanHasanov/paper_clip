@@ -189,6 +189,7 @@ const ProfileComponent = ({ onBack }) => {
 
       document.body.appendChild(cameraContainer);
       setIsPhotoLoading(false);
+      setShowPhotoMenu(false);
     } catch (err) {
       console.error("Ошибка доступа к камере:", err);
       setIsPhotoLoading(false);
@@ -242,6 +243,8 @@ const ProfileComponent = ({ onBack }) => {
         minHeight: "100vh",
         position: "relative",
         paddingBottom: "100px",
+        filter: showPhotoMenu ? "blur(2.5px)" : "none",
+        transition: "filter 0.3s ease",
       }}
     >
       <ProgressBar currentStep={3} totalSteps={3} />
