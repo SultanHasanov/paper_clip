@@ -82,23 +82,50 @@ const ProfileComponent = ({ onBack }) => {
     setShowPhotoMenu(true);
   };
 
-  const handleTakePhoto = () => {
-    // Создаем input элемент для камеры
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'camera'; // Используем камеру
+ const handleTakePhoto = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        processImageFile(file);
-      }
+    // создаём элемент <video>, чтобы показать превью камеры
+    const video = document.createElement('video');
+    video.autoplay = true;
+    video.playsInline = true;
+    video.srcObject = stream;
+    video.style.width = "100%";
+    video.style.maxHeight = "400px";
+    document.body.appendChild(video);
+
+    // создаём кнопку "Сделать снимок"
+    const captureBtn = document.createElement('button');
+    captureBtn.innerText = "📸 Сделать снимок";
+    captureBtn.style.display = "block";
+    captureBtn.style.margin = "20px auto";
+    document.body.appendChild(captureBtn);
+
+    captureBtn.onclick = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const dataUrl = canvas.toDataURL("image/png");
+      setPhotoUrl(dataUrl); // сохраняем фото в state
+      
+      // останавливаем камеру
+      stream.getTracks().forEach(track => track.stop());
+      
+      // убираем временные элементы
+      video.remove();
+      captureBtn.remove();
     };
-    
-    input.click();
-    setShowPhotoMenu(false);
-  };
+  } catch (err) {
+    message.error("Ошибка доступа к камере");
+    console.error(err);
+  }
+  setShowPhotoMenu(false);
+};
+
 
   const handleChooseFromGallery = () => {
     // Активируем скрытый input для выбора файла
