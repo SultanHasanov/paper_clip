@@ -16,23 +16,22 @@ const DatingGoalsComponent = ({ onNext }) => {
     "Спорт",
   ]);
   const [searchValue, setSearchValue] = useState("");
+  const [showFixedButtons, setShowFixedButtons] = useState(true);
 
   useEffect(() => {
-    const handleFocus = () => {
-      const tg = window.Telegram?.WebApp;
-      tg?.expand();
-    };
+    const input = document.querySelector("input"); // ваш единственный поиск
 
-    // Добавляем обработчики для поля поиска
-    const inputs = document.querySelectorAll("input");
-    inputs.forEach((input) => {
-      input.addEventListener("focus", handleFocus);
-    });
+    if (!input) return;
+
+    const handleFocus = () => setShowFixedButtons(false);
+    const handleBlur = () => setShowFixedButtons(true);
+
+    input.addEventListener("focus", handleFocus);
+    input.addEventListener("blur", handleBlur);
 
     return () => {
-      inputs.forEach((input) => {
-        input.removeEventListener("focus", handleFocus);
-      });
+      input.removeEventListener("focus", handleFocus);
+      input.removeEventListener("blur", handleBlur);
     };
   }, []);
 
@@ -225,11 +224,13 @@ const DatingGoalsComponent = ({ onNext }) => {
         </Space>
       </Card>
 
-      <FixedButtons
-        onNext={() => onNext(selectedGoals)}
-        nextButtonText="Далее"
-        showBackButton={false}
-      />
+      {showFixedButtons && (
+        <FixedButtons
+          onNext={() => onNext(selectedGoals)}
+          nextButtonText="Далее"
+          showBackButton={false}
+        />
+      )}
     </div>
   );
 };

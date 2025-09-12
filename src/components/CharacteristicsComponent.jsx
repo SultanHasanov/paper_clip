@@ -15,25 +15,24 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
     "Вегетарианец",
   ]);
   const [searchValue, setSearchValue] = useState("");
+  const [showFixedButtons, setShowFixedButtons] = useState(true);
 
   useEffect(() => {
-  const handleFocus = () => {
-    const tg = window.Telegram?.WebApp;
-    tg?.expand();
-  };
+    const input = document.querySelector("input"); // у вас один основной input для поиска
 
-  // Добавляем обработчики для поля поиска
-  const inputs = document.querySelectorAll('input');
-  inputs.forEach(input => {
-    input.addEventListener('focus', handleFocus);
-  });
+    if (!input) return;
 
-  return () => {
-    inputs.forEach(input => {
-      input.removeEventListener('focus', handleFocus);
-    });
-  };
-}, []);
+    const handleFocus = () => setShowFixedButtons(false);
+    const handleBlur = () => setShowFixedButtons(true);
+
+    input.addEventListener("focus", handleFocus);
+    input.addEventListener("blur", handleBlur);
+
+    return () => {
+      input.removeEventListener("focus", handleFocus);
+      input.removeEventListener("blur", handleBlur);
+    };
+  }, []);
 
   const recommendedCharacteristics = [
     "Люблю животных",
@@ -228,12 +227,14 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
         </Space>
       </Card>
 
-      <FixedButtons
-        onNext={() => onNext(selectedCharacteristics)}
-        onBack={onBack}
-        nextButtonText="Далее"
-        showBackButton={true}
-      />
+      {showFixedButtons && (
+        <FixedButtons
+          onNext={() => onNext(selectedCharacteristics)}
+          onBack={onBack}
+          nextButtonText="Далее"
+          showBackButton={true}
+        />
+      )}
     </div>
   );
 };
