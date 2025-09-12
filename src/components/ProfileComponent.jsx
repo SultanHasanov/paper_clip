@@ -86,16 +86,25 @@ const ProfileComponent = ({ onBack }) => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     
-    // создаём элемент <video>, чтобы показать превью камеры
     const video = document.createElement('video');
     video.autoplay = true;
     video.playsInline = true;
+    video.muted = true; // обязательно для автозапуска
     video.srcObject = stream;
     video.style.width = "100%";
     video.style.maxHeight = "400px";
+    
+    // ждём готовности
+    video.onloadedmetadata = async () => {
+      try {
+        await video.play();
+      } catch (err) {
+        console.error("Не удалось воспроизвести видео:", err);
+      }
+    };
+
     document.body.appendChild(video);
 
-    // создаём кнопку "Сделать снимок"
     const captureBtn = document.createElement('button');
     captureBtn.innerText = "📸 Сделать снимок";
     captureBtn.style.display = "block";
@@ -110,12 +119,12 @@ const ProfileComponent = ({ onBack }) => {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       const dataUrl = canvas.toDataURL("image/png");
-      setPhotoUrl(dataUrl); // сохраняем фото в state
-      
-      // останавливаем камеру
+      setPhotoUrl(dataUrl);
+
+      // Останавливаем камеру
       stream.getTracks().forEach(track => track.stop());
-      
-      // убираем временные элементы
+
+      // Убираем временные элементы
       video.remove();
       captureBtn.remove();
     };
