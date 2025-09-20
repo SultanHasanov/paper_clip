@@ -6,7 +6,7 @@ import FixedButtons from "./FixedButtons";
 
 const { Title, Text } = Typography;
 
-const ProfileComponent = ({ onBack }) => {
+const ProfileComponent = ({ onBack, onComplete }) => {
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [about, setAbout] = useState("");
@@ -70,7 +70,14 @@ const ProfileComponent = ({ onBack }) => {
   };
 
   const handleProfileComplete = () => {
-    alert("Профиль создан!");
+    // Собираем данные профиля и передаем их в onComplete
+    const profileData = {
+      name,
+      birthDate,
+      about,
+      photoUrl
+    };
+    onComplete(profileData);
   };
 
   const handleAvatarClick = () => {
@@ -247,7 +254,7 @@ const ProfileComponent = ({ onBack }) => {
         transition: "filter 0.3s ease",
       }}
     >
-      <ProgressBar currentStep={3} totalSteps={3} />
+      <ProgressBar currentStep={4} totalSteps={4} />
 
       <div style={{ textAlign: "center", marginBottom: "40px" }}>
         <Title
@@ -491,11 +498,7 @@ const ProfileComponent = ({ onBack }) => {
           onNext={handleProfileComplete}
           onBack={onBack}
           nextButtonText="Далее"
-          nextButtonStyle={{
-            backgroundColor: "#7A7A7A",
-            borderColor: "#7A7A7A",
-            color: "#FFFFFF",
-          }}
+         
           showBackButton={true}
         />
       )}

@@ -1,23 +1,29 @@
-// components/DatingGoalsComponent.jsx
+// components/DesiredCharacteristics.jsx
 import React, { useEffect, useState } from "react";
-import { Card, Tag, Input, Button, Space, Typography } from "antd";
-import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
+import { Card, Tag, Space, Typography, Button, Input } from "antd";
+import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
 import ProgressBar from "./ProgressBar";
 import FixedButtons from "./FixedButtons";
 
 const { Title, Text } = Typography;
 
-const DatingGoalsComponent = ({ onNext }) => {
+const DesiredCharacteristics = ({ onNext, onBack }) => {
   const [selectedGoals, setSelectedGoals] = useState([
     "Кино или театр",
     "Путешествие",
     "Прогулки",
-    "Бильярд",
+    "Дружба",
     "Спорт",
   ]);
-  const [searchValue, setSearchValue] = useState("");
+  const [selectedCharacteristics, setSelectedCharacteristics] = useState([
+    "Парень",
+    "С юмором",
+    "Воронеж",
+    "Дружба",
+  ]);
   const [showFixedButtons, setShowFixedButtons] = useState(true);
-
+  const [searchValue, setSearchValue] = useState("");
+  
   useEffect(() => {
     const input = document.querySelector("input"); // ваш единственный поиск
 
@@ -34,37 +40,41 @@ const DatingGoalsComponent = ({ onNext }) => {
       input.removeEventListener("blur", handleBlur);
     };
   }, []);
-
-  const recommendedGoals = [
-    "Путешествие",
-    "Прогулка",
-    "Йога",
-    "Концерт",
-    "Бокс",
+  const recommendedCharacteristics = [
+    "Парень",
+    "Девушка",
+    "Семья",
     "Спорт",
-    "Походы и трекинг",
-    "Совместная поездка",
-    "Бильярд",
-    "Йога",
-    "Музеи и выставки",
-    "Совместные хобби",
+    "С юмором",
+    "Высокий",
+    "Творческая",
+    "Общение",
+    "Санкт Петербург",
+    "Дружба",
+    "Москва",
+    "Путешествия",
+    "ЗОЖ",
+    "Танцы",
   ];
 
   const handleRemoveGoal = (goalToRemove) => {
     setSelectedGoals(selectedGoals.filter((goal) => goal !== goalToRemove));
   };
 
-  const handleAddGoal = (goalToAdd) => {
-    if (!selectedGoals.includes(goalToAdd)) {
-      setSelectedGoals([...selectedGoals, goalToAdd]);
-    }
+  const handleRemoveCharacteristic = (characteristicToRemove) => {
+    setSelectedCharacteristics(
+      selectedCharacteristics.filter((char) => char !== characteristicToRemove)
+    );
   };
 
-  const filteredRecommended = recommendedGoals.filter(
-    (goal) =>
-      !selectedGoals.includes(goal) &&
-      goal.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  const handleAddCharacteristic = (characteristicToAdd) => {
+    if (!selectedCharacteristics.includes(characteristicToAdd)) {
+      setSelectedCharacteristics([
+        ...selectedCharacteristics,
+        characteristicToAdd,
+      ]);
+    }
+  };
 
   return (
     <div
@@ -78,10 +88,10 @@ const DatingGoalsComponent = ({ onNext }) => {
         paddingBottom: "100px",
       }}
     >
-      <ProgressBar currentStep={1} totalSteps={4} />
+      <ProgressBar currentStep={2} totalSteps={4} />
 
       <div
-        style={{ textAlign: "center", marginBottom: "20px", padding: "0 25px" }}
+        style={{ textAlign: "center", marginBottom: "20px", padding: "0 10px" }}
       >
         <Title
           level={2}
@@ -92,7 +102,7 @@ const DatingGoalsComponent = ({ onNext }) => {
             marginBottom: "16px",
           }}
         >
-          Цели знакомства
+          Желаемые характеристики
         </Title>
         <Text
           style={{
@@ -103,32 +113,33 @@ const DatingGoalsComponent = ({ onNext }) => {
             fontWeight: 200,
           }}
         >
-          Выберите какие цели знакомства вам интересны. Это поможет подобрать
-          людей с похожими интересами
+          Выберите желаемые характеристики для того, чтобы найти именно того,
+          кого ищете
         </Text>
       </div>
 
+      {/* Карточка с выбранными целями */}
       <Card
         style={{
-          marginBottom: "12px",
+          marginBottom: "16px",
           borderRadius: "12px",
           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         }}
-        bodyStyle={{ padding: "12px" }}
+        bodyStyle={{ padding: "16px" }}
       >
         <Title
           level={4}
           style={{
             color: "#999FAA",
             fontWeight: 600,
-            marginBottom: "15px",
-            fontSize: "clamp(18px, 3.5vw, 18px)",
+            marginBottom: "12px",
+            fontSize: "clamp(16px, 3.5vw, 16px)",
           }}
         >
-          Мои цели
+          Выбранные цели
         </Title>
 
-        <Space size={[0, 6]} wrap style={{ marginBottom: "16px" }}>
+        <Space size={[0, 6]} wrap style={{ marginBottom: "0px" }}>
           {selectedGoals.map((goal, index) => (
             <Tag
               key={index}
@@ -148,9 +159,60 @@ const DatingGoalsComponent = ({ onNext }) => {
                 fontSize: "clamp(14px, 2.5vw, 14px)",
                 lineHeight: "20px",
                 height: "auto",
+                marginBottom: "8px",
               }}
             >
               {goal}
+            </Tag>
+          ))}
+        </Space>
+      </Card>
+
+      {/* Карточка с желаемыми характеристиками */}
+      <Card
+        style={{
+          marginBottom: "16px",
+          borderRadius: "12px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        }}
+        bodyStyle={{ padding: "16px" }}
+      >
+        <Title
+          level={4}
+          style={{
+            color: "#999FAA",
+            fontWeight: 600,
+            marginBottom: "12px",
+            fontSize: "clamp(16px, 3.5vw, 16px)",
+          }}
+        >
+          Желаемые характеристики
+        </Title>
+
+        <Space size={[0, 6]} wrap style={{ marginBottom: "16px" }}>
+          {selectedCharacteristics.map((char, index) => (
+            <Tag
+              key={index}
+              closable
+              onClose={() => handleRemoveCharacteristic(char)}
+              closeIcon={
+                <CloseOutlined
+                  style={{ fontSize: "10px", marginLeft: 10, color: "#404040" }}
+                />
+              }
+              style={{
+                backgroundColor: "#EFF0F2",
+                color: "#404040",
+                border: "none",
+                borderRadius: "5px",
+                padding: "8px 8px 8px 8px",
+                fontSize: "clamp(14px, 2.5vw, 14px)",
+                lineHeight: "20px",
+                height: "auto",
+                marginBottom: "8px",
+              }}
+            >
+              {char}
             </Tag>
           ))}
         </Space>
@@ -181,13 +243,14 @@ const DatingGoalsComponent = ({ onNext }) => {
         />
       </Card>
 
+      {/* Карточка с рекомендуемыми характеристиками */}
       <Card
         style={{
           marginBottom: "30px",
           borderRadius: "12px",
           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         }}
-        bodyStyle={{ padding: "clamp(16px, 4vw, 24px)" }}
+        bodyStyle={{ padding: "16px" }}
       >
         <Title
           level={4}
@@ -195,17 +258,17 @@ const DatingGoalsComponent = ({ onNext }) => {
             color: "#999FAA",
             fontWeight: 600,
             marginBottom: "16px",
-            fontSize: "clamp(18px, 3.5vw, 18px)",
+            fontSize: "clamp(16px, 3.5vw, 16px)",
           }}
         >
           Рекомендуемые
         </Title>
 
         <Space size={[0, 6]} wrap>
-          {filteredRecommended.map((goal, index) => (
+          {recommendedCharacteristics.map((char, index) => (
             <Tag
               key={index}
-              onClick={() => handleAddGoal(goal)}
+              onClick={() => handleAddCharacteristic(char)}
               style={{
                 backgroundColor: "#EFF0F2",
                 color: "#404040",
@@ -216,9 +279,10 @@ const DatingGoalsComponent = ({ onNext }) => {
                 lineHeight: "20px",
                 height: "auto",
                 cursor: "pointer",
+                marginBottom: "8px",
               }}
             >
-              {goal}
+              {char}
             </Tag>
           ))}
         </Space>
@@ -226,13 +290,15 @@ const DatingGoalsComponent = ({ onNext }) => {
 
       {showFixedButtons && (
         <FixedButtons
-          onNext={() => onNext(selectedGoals)}
+          onNext={() => onNext({ selectedGoals, selectedCharacteristics })}
+          onBack={onBack}
           nextButtonText="Далее"
-          showBackButton={false}
+          showBackButton={true}
+          backButtonText="Назад"
         />
       )}
     </div>
   );
 };
 
-export default DatingGoalsComponent;
+export default DesiredCharacteristics;

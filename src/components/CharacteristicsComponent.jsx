@@ -81,7 +81,7 @@ const CharacteristicsComponent = ({ onNext, onBack }) => {
         paddingBottom: "100px",
       }}
     >
-      <ProgressBar currentStep={2} totalSteps={3} />
+      <ProgressBar currentStep={3} totalSteps={4} />
 
       <div
         style={{ textAlign: "center", marginBottom: "20px", padding: "0 10px" }}
